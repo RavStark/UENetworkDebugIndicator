@@ -3,21 +3,21 @@
     <name>Unreal Engine Debug Context Indicator</name>
     <version>1.0.0</version>
     <vendor>Krafton</vendor>
-    
+
     <description><![CDATA[
         Shows a visual indicator when debugging Unreal Engine 5 projects to identify
         whether you're currently debugging Server, Client, or Listen Server code.
         The indicator appears as a colored tooltip in the top-left corner of the editor.
     ]]></description>
-    
+
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.xdebugger</depends>
-    
+
     <extensions defaultExtensionNs="com.intellij">
         <projectComponent implementation="com.unrealdebugger.UnrealDebugIndicatorPlugin"/>
     </extensions>
-    
+
     <actions>
         <action id="ToggleUEDebugIndicator"
                 class="com.unrealdebugger.ToggleIndicatorAction"

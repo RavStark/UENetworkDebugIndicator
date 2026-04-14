@@ -14,5 +14,10 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.xdebugger</depends>
 
+    <projectListeners>
+        <listener class="com.unrealdebugger.DebugSessionListener"
+                  topic="com.intellij.xdebugger.XDebuggerManagerListener"/>
+    </projectListeners>
+
     <!-- Actions will be added in Task 7 -->
 </idea-plugin>

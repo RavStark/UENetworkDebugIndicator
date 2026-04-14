@@ -19,5 +19,12 @@
                   topic="com.intellij.xdebugger.XDebuggerManagerListener"/>
     </projectListeners>
 
-    <!-- Actions will be added in Task 7 -->
+    <actions>
+        <action id="ToggleUEDebugIndicator"
+                class="com.unrealdebugger.ToggleIndicatorAction"
+                text="Toggle UE Debug Indicator"
+                description="Toggle the Unreal Engine debug context indicator on/off">
+            <add-to-group group-id="XDebugger.ToolWindow.TopToolbar3" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

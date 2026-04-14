@@ -62,9 +62,9 @@ object ContextEvaluator {
                 // Strip surrounding quotes if present (debugger may return "\"Server\"").
                 val cleaned = valueStr
                     .trim()
+                    .let { if (it.startsWith("L\"") && it.endsWith("\"")) it.removePrefix("L\"").removeSuffix("\"") else it }
                     .removeSurrounding("\"")
                     .removeSurrounding("'")
-                    .removeSurrounding("L\"", "\"") // Wide string prefix
                 callback(cleaned)
             }
 
@@ -88,6 +88,7 @@ object ContextEvaluator {
                 })
                 val cleaned = sb.toString()
                     .trim()
+                    .let { if (it.startsWith("L\"") && it.endsWith("\"")) it.removePrefix("L\"").removeSuffix("\"") else it }
                     .removeSurrounding("\"")
                     .removeSurrounding("'")
                 callback(cleaned)

@@ -3,20 +3,20 @@ package com.unrealdebugger
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
+import com.intellij.util.messages.MessageBusConnection
 import com.intellij.xdebugger.XDebugProcess
-import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebugSessionListener
 import com.intellij.xdebugger.XDebuggerManagerListener
 
 class DebugSessionListener(private val project: Project) : XDebuggerManagerListener {
 
     private var isPaused = false
-    private var editorListener: FileEditorManagerListener? = null
+    private var editorConnection: MessageBusConnection? = null
 
     override fun processStarted(debugProcess: XDebugProcess) {
         val session = debugProcess.session
 
-        session.addSessionListener(object : XDebugSessionListener {
+        val sessionListener = object : XDebugSessionListener {
             override fun sessionPaused() {
                 isPaused = true
                 val settings = IndicatorSettings.getInstance(project)
@@ -40,26 +40,28 @@ class DebugSessionListener(private val project: Project) : XDebuggerManagerListe
                 isPaused = false
                 stopTrackingEditorChanges()
                 IndicatorOverlay.getInstance(project).hide()
+                session.removeSessionListener(this)
             }
-        })
+        }
+        session.addSessionListener(sessionListener)
     }
 
     private fun startTrackingEditorChanges() {
-        if (editorListener != null) return
+        if (editorConnection != null) return
 
-        editorListener = object : FileEditorManagerListener {
+        val connection = project.messageBus.connect()
+        editorConnection = connection
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
             override fun selectionChanged(event: FileEditorManagerEvent) {
                 if (isPaused) {
                     IndicatorOverlay.getInstance(project).moveToActiveEditor()
                 }
             }
-        }
-
-        project.messageBus.connect()
-            .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, editorListener!!)
+        })
     }
 
     private fun stopTrackingEditorChanges() {
-        editorListener = null
+        editorConnection?.disconnect()
+        editorConnection = null
     }
 }

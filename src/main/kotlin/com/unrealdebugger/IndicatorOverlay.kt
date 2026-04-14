@@ -2,20 +2,17 @@ package com.unrealdebugger
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.event.VisibleAreaEvent
 import com.intellij.openapi.editor.event.VisibleAreaListener
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import java.awt.Color
-import java.awt.Component
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.SwingUtilities
 import javax.swing.border.EmptyBorder
@@ -38,6 +35,7 @@ class IndicatorOverlay(private val project: Project) {
 
             val editor = getActiveEditor() ?: return@invokeLater
             attachToEditor(editor)
+            label.size = label.preferredSize
             reposition()
         }
     }

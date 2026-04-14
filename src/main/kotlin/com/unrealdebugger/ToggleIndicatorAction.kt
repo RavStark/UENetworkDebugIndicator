@@ -1,5 +1,6 @@
 package com.unrealdebugger
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
@@ -27,5 +28,5 @@ class ToggleIndicatorAction : AnAction() {
         }
     }
 
-    override fun getActionUpdateThread() = com.intellij.openapi.actionSystem.ActionUpdateThread.BGT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 }

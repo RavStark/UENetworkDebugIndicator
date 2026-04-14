@@ -13,7 +13,7 @@ import com.intellij.openapi.project.Project
 )
 class IndicatorSettings : PersistentStateComponent<IndicatorSettings.State> {
 
-    data class State(var isEnabled: Boolean = true)
+    data class State(@Volatile var isEnabled: Boolean = true)
 
     private var state = State()
 

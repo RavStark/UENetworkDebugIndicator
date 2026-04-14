@@ -14,6 +14,11 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.xdebugger</depends>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.unrealdebugger.IndicatorSettings"/>
+        <projectService serviceImplementation="com.unrealdebugger.IndicatorOverlay"/>
+    </extensions>
+
     <projectListeners>
         <listener class="com.unrealdebugger.DebugSessionListener"
                   topic="com.intellij.xdebugger.XDebuggerManagerListener"/>
@@ -22,7 +27,7 @@
     <actions>
         <action id="ToggleUEDebugIndicator"
                 class="com.unrealdebugger.ToggleIndicatorAction"
-                text="Toggle UE Debug Indicator"
+                text="Disable UE Debug Indicator"
                 description="Toggle the Unreal Engine debug context indicator on/off">
             <add-to-group group-id="XDebugger.ToolWindow.TopToolbar3" anchor="last"/>
         </action>

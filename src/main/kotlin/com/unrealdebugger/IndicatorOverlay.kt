@@ -25,10 +25,10 @@ class IndicatorOverlay(private val project: Project) {
     private var visibleAreaListener: VisibleAreaListener? = null
     private var resizeListener: ComponentAdapter? = null
 
-    fun show(context: DebugContext) {
+    fun show(result: ContextEvaluator.Result) {
         SwingUtilities.invokeLater {
-            label.text = " ${context.label} "
-            label.background = context.backgroundColor
+            label.text = " ${result.text} "
+            label.background = result.color
             label.foreground = Color.WHITE
             label.isOpaque = false  // We paint background ourselves for rounded corners
             label.isVisible = true

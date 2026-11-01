@@ -1,8 +1,8 @@
 <idea-plugin>
-    <id>com.krafton.unreal-debug-indicator</id>
+    <id>com.ravensstudio.unreal-debug-indicator</id>
     <name>Unreal Engine Debug Context Indicator</name>
     <version>1.0.0</version>
-    <vendor>Krafton</vendor>
+    <vendor>Ravens Studio</vendor>
 
     <description><![CDATA[
         Shows a color-coded badge (SERVER / CLIENT / LISTEN SERVER) in the bottom-right

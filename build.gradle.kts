@@ -1,10 +1,10 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.intellij.platform") version "2.2.1"
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
+    id("org.jetbrains.intellij.platform")
 }
 
-group = "com.krafton"
+group = "com.ravensstudio"
 version = "1.0.0"
 
 repositories {
@@ -16,8 +16,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        rider("2025.1")
-        instrumentationTools()
+        rider("2025.3")
     }
     testImplementation("junit:junit:4.13.2")
 }
@@ -28,7 +27,8 @@ kotlin {
 
 tasks {
     patchPluginXml {
-        sinceBuild.set("251")
-        untilBuild.set("251.*")
+        sinceBuild.set("253")
+        // No upper bound: compatible with Rider 2025.3 and every later version
+        untilBuild = provider { null }
     }
 }

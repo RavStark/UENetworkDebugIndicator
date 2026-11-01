@@ -22,9 +22,9 @@ class DebugSessionListener(private val project: Project) : XDebuggerManagerListe
                 val settings = IndicatorSettings.getInstance(project)
                 if (!settings.isEnabled) return
 
-                ContextEvaluator.evaluate(session) { context ->
+                ContextEvaluator.evaluate(session) { result ->
                     val overlay = IndicatorOverlay.getInstance(project)
-                    overlay.show(context)
+                    overlay.show(result)
                 }
 
                 startTrackingEditorChanges()

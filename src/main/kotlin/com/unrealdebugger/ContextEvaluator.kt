@@ -6,6 +6,8 @@ import com.intellij.xdebugger.frame.XValue
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.intellij.xdebugger.frame.presentation.XValuePresentation
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import java.awt.Color
 import javax.swing.Icon
 
 object ContextEvaluator {
@@ -18,15 +20,21 @@ object ContextEvaluator {
      * Calls [callback] on a background thread with the parsed result.
      * Calls [callback] with UNKNOWN on any failure.
      */
-    fun evaluate(session: XDebugSession, callback: (DebugContext) -> Unit) {
+    data class Result(val text: String, val color: Color)
+
+    private val COLOR_CLIENT = Color(0x33, 0x99, 0x33)
+    private val COLOR_SERVER = Color(0xCC, 0x33, 0x33)
+    private val COLOR_DEFAULT = Color(0x66, 0x66, 0x66)
+
+    fun evaluate(session: XDebugSession, callback: (Result) -> Unit) {
         val frame = session.currentStackFrame
         if (frame == null) {
-            callback(DebugContext.UNKNOWN)
+            callback(Result("no frame", COLOR_DEFAULT))
             return
         }
         val evaluator = frame.evaluator
         if (evaluator == null) {
-            callback(DebugContext.UNKNOWN)
+            callback(Result("no evaluator", COLOR_DEFAULT))
             return
         }
 
@@ -35,16 +43,29 @@ object ContextEvaluator {
             object : XDebuggerEvaluator.XEvaluationCallback {
                 override fun evaluated(result: XValue) {
                     extractStringValue(result) { value ->
-                        callback(DebugContext.fromString(value))
+                        val text = cleanRaw(value ?: "null")
+                        val color = when {
+                            text.contains("client", ignoreCase = true) -> COLOR_CLIENT
+                            text.contains("server", ignoreCase = true) -> COLOR_SERVER
+                            else -> COLOR_DEFAULT
+                        }
+                        callback(Result(text, color))
                     }
                 }
 
                 override fun errorOccurred(errorMessage: String) {
-                    callback(DebugContext.UNKNOWN)
+                    callback(Result("error: $errorMessage", COLOR_DEFAULT))
                 }
             },
             frame.sourcePosition
         )
+    }
+
+    private fun cleanRaw(raw: String): String {
+        return raw.trim()
+            .let { if (it.startsWith("L\"") && it.endsWith("\"")) it.removePrefix("L\"").removeSuffix("\"") else it }
+            .removeSurrounding("\"")
+            .removeSurrounding("'")
     }
 
     /**
@@ -58,14 +79,7 @@ object ContextEvaluator {
                 valueStr: String,
                 hasChildren: Boolean
             ) {
-                // valueStr contains the evaluated result as a display string.
-                // Strip surrounding quotes if present (debugger may return "\"Server\"").
-                val cleaned = valueStr
-                    .trim()
-                    .let { if (it.startsWith("L\"") && it.endsWith("\"")) it.removePrefix("L\"").removeSuffix("\"") else it }
-                    .removeSurrounding("\"")
-                    .removeSurrounding("'")
-                callback(cleaned)
+                callback(valueStr)
             }
 
             override fun setPresentation(
@@ -73,25 +87,19 @@ object ContextEvaluator {
                 presentation: XValuePresentation,
                 hasChildren: Boolean
             ) {
-                // Fallback: render the presentation to text
                 val sb = StringBuilder()
                 presentation.renderValue(object : XValuePresentation.XValueTextRenderer {
                     override fun renderValue(value: String) { sb.append(value) }
                     override fun renderStringValue(value: String) { sb.append(value) }
                     override fun renderNumericValue(value: String) { sb.append(value) }
                     override fun renderKeywordValue(value: String) { sb.append(value) }
-                    override fun renderValue(value: String, key: XValuePresentation.TextAttributesKey) { sb.append(value) }
+                    override fun renderValue(value: String, key: TextAttributesKey) { sb.append(value) }
                     override fun renderStringValue(value: String, additionalSpecialCharsToHighlight: String?, maxLength: Int) { sb.append(value) }
                     override fun renderComment(comment: String) {}
                     override fun renderSpecialSymbol(symbol: String) {}
                     override fun renderError(error: String) {}
                 })
-                val cleaned = sb.toString()
-                    .trim()
-                    .let { if (it.startsWith("L\"") && it.endsWith("\"")) it.removePrefix("L\"").removeSuffix("\"") else it }
-                    .removeSurrounding("\"")
-                    .removeSurrounding("'")
-                callback(cleaned)
+                callback(sb.toString())
             }
 
             override fun setFullValueEvaluator(fullValueEvaluator: com.intellij.xdebugger.frame.XFullValueEvaluator) {}
